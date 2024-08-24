@@ -14,6 +14,7 @@ class ToDoTableViewCell: UITableViewCell {
     // UI components
     private let titleLabel: UILabel = {
         let label = UILabel()
+        label.numberOfLines = 0
         label.font = UIFont.systemFont(ofSize: 18, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -65,7 +66,6 @@ class ToDoTableViewCell: UITableViewCell {
             dateLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
             
             completedLabel.centerYAnchor.constraint(equalTo: dateLabel.centerYAnchor),
-            completedLabel.leadingAnchor.constraint(equalTo: dateLabel.trailingAnchor, constant: 10),
             completedLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
             completedLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10)
         ])

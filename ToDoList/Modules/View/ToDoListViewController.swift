@@ -34,19 +34,51 @@ class ToDoListViewController: UIViewController, ToDoListView {
         tableView.dataSource = self
         
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.topAnchor),
-            tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            tableView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
         
-        fetchToDos()
+        // Check UserDefaults to see if this is the first launch
+        let hasFetchedToDos = UserDefaults.standard.bool(forKey: "hasFetchedToDos")
+        if !hasFetchedToDos {
+            firstFetchToDos()
+            // Mark that firstFetchToDos has been called
+            UserDefaults.standard.set(true, forKey: "hasFetchedToDos")
+        } else {
+            fetchToDos()
+        }
+        
         
         let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addToDo))
         navigationItem.rightBarButtonItem = addButton
         
         NotificationCenter.default.addObserver(self, selector: #selector(fetchToDos), name: .didAddNewToDo, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(fetchToDos), name: .didUpdateToDo, object: nil)
+    }
+    
+    @objc private func firstFetchToDos() {
+        CoreDataManager.shared.firstFetchToDos { [weak self] result in
+            switch result {
+            case .success(let todos):
+                self?.todos.append(contentsOf: todos)
+                
+                // Reload the table view on the main thread
+                DispatchQueue.main.async {
+                    self?.tableView.reloadData()
+                }
+                
+            case .failure(let error):
+                // Handle the error (e.g., show an alert)
+                print("Error: \(error.localizedDescription)")
+                
+                // Optionally reload the table view with an error state
+                DispatchQueue.main.async {
+                    self?.tableView.reloadData()
+                }
+            }
+        }
     }
     
     @objc private func fetchToDos() {

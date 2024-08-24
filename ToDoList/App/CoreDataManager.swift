@@ -7,6 +7,22 @@
 
 import UIKit
 import CoreData
+import Alamofire
+
+struct Todo: Decodable {
+    let id: Int
+    let todo: String
+    let completed: Bool
+    let userId: Int
+}
+
+// Define the response model
+struct TodoResponse: Decodable {
+    let todos: [Todo]
+    let total: Int
+    let skip: Int
+    let limit: Int
+}
 
 public final class CoreDataManager: NSObject {
     
@@ -36,8 +52,28 @@ public final class CoreDataManager: NSObject {
         saveContext()
     }
     
+    func firstFetchToDos(completion: @escaping (Result<[ToDoItem], Error>) -> Void) {
+        let url = "https://dummyjson.com/todos"
+        var toDos: [ToDoItem] = []
+        
+        AF.request(url).validate().responseDecodable(of: TodoResponse.self) { response in
+            switch response.result {
+            case .success(let todoResponse):
+                for todo in todoResponse.todos {
+                    self.createToDo(title: todo.todo, description: nil, createdDate: Date(), isCompleted: todo.completed)
+                }
+                toDos = self.fetchToDos()
+                completion(.success(toDos))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
     public func fetchToDos() -> [ToDoItem] {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "ToDoItem")
+        let sortDescriptor = NSSortDescriptor(key: "createdDate", ascending: false)
+        fetchRequest.sortDescriptors = [sortDescriptor]
         
         do {
             return (try context.fetch(fetchRequest) as? [ToDoItem]) ?? []
