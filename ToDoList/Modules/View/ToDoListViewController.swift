@@ -59,32 +59,40 @@ class ToDoListViewController: UIViewController, ToDoListView {
     }
     
     @objc private func firstFetchToDos() {
-        CoreDataManager.shared.firstFetchToDos { [weak self] result in
-            switch result {
-            case .success(let todos):
-                self?.todos.append(contentsOf: todos)
-                
-                // Reload the table view on the main thread
-                DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                }
-                
-            case .failure(let error):
-                // Handle the error (e.g., show an alert)
-                print("Error: \(error.localizedDescription)")
-                
-                // Optionally reload the table view with an error state
-                DispatchQueue.main.async {
-                    self?.tableView.reloadData()
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            CoreDataManager.shared.firstFetchToDos { result in
+                switch result {
+                case .success(let todos):
+                    self?.todos.append(contentsOf: todos)
+                    
+                    // Reload the table view on the main thread
+                    DispatchQueue.main.async {
+                        self?.tableView.reloadData()
+                    }
+                    
+                case .failure(let error):
+                    // Handle the error (e.g., show an alert)
+                    print("Error: \(error.localizedDescription)")
+                    
+                    // Optionally reload the table view with an error state
+                    DispatchQueue.main.async {
+                        self?.tableView.reloadData()
+                    }
                 }
             }
         }
     }
     
     @objc private func fetchToDos() {
-        // Assuming CoreDataManager is set up to fetch ToDo items
-        todos = CoreDataManager.shared.fetchToDos()
-        tableView.reloadData()
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            // Assuming CoreDataManager is set up to fetch ToDo items
+            let fetchedToDos = CoreDataManager.shared.fetchToDos()
+            
+            DispatchQueue.main.async {
+                self?.todos = fetchedToDos
+                self?.tableView.reloadData()
+            }
+        }
     }
     
     @objc private func addToDo() {
@@ -139,9 +147,15 @@ extension ToDoListViewController: UITableViewDataSource, UITableViewDelegate {
             guard let self = self else { return }
             
             let toDoToDelete = self.todos[indexPath.row]
-            CoreDataManager.shared.deleteToDo(toDoToDelete)
-            self.todos.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
+            
+            DispatchQueue.global(qos: .background).async {
+                CoreDataManager.shared.deleteToDo(toDoToDelete)
+                
+                DispatchQueue.main.async {
+                    self.todos.remove(at: indexPath.row)
+                    tableView.deleteRows(at: [indexPath], with: .fade)
+                }
+            }
             
             completionHandler(true)
         }
@@ -160,12 +174,16 @@ extension ToDoListViewController: UITableViewDataSource, UITableViewDelegate {
         let completeAction = UIContextualAction(style: .normal, title: title) { [weak self] _, _, completionHandler in
             guard self != nil else { return }
             
-            // Toggle completion status
-            toDo.isCompleted.toggle()
-            CoreDataManager.shared.updateToDo(toDo: toDo, title: toDo.title ?? "", description: toDo.todoDescription, isCompleted: toDo.isCompleted)
-            
-            // Reload the specific row
-            tableView.reloadRows(at: [indexPath], with: .automatic)
+            DispatchQueue.global(qos: .background).async {
+                // Toggle completion status
+                toDo.isCompleted.toggle()
+                CoreDataManager.shared.updateToDo(toDo: toDo, title: toDo.title ?? "", description: toDo.todoDescription, isCompleted: toDo.isCompleted)
+                
+                DispatchQueue.main.async {
+                    // Reload the specific row
+                    tableView.reloadRows(at: [indexPath], with: .automatic)
+                }
+            }
             
             completionHandler(true)
         }

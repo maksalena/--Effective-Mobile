@@ -71,20 +71,16 @@ class AddToDoViewController: UIViewController {
     }
     
     @objc private func saveToDo() {
-        guard let title = titleTextField.text, !title.isEmpty else {
-            // Show an alert or handle empty title case
-            return
-        }
+        guard let title = titleTextField.text, !title.isEmpty else { return }
         
-        let description = descriptionTextView.text
-        let createdDate = Date()
-        let isCompleted = false
-        
-        CoreDataManager.shared.createToDo(title: title, description: description, createdDate: createdDate, isCompleted: isCompleted)
-        
-        dismiss(animated: true) {
-            // Optionally notify the ToDoListViewController to refresh data
-            NotificationCenter.default.post(name: .didAddNewToDo, object: nil)
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            CoreDataManager.shared.createToDo(title: title, description: self?.descriptionTextView.text, createdDate: Date(), isCompleted: false)
+            
+            DispatchQueue.main.async {
+                // Notify observers about the addition of a new ToDo
+                NotificationCenter.default.post(name: .didAddNewToDo, object: nil)
+                self?.dismiss(animated: true, completion: nil)
+            }
         }
     }
     
