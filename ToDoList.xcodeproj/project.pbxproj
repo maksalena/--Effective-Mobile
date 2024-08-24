@@ -22,6 +22,7 @@
 		CA9DACE22C79D84100ACFE80 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9DACE12C79D84100ACFE80 /* CoreDataManager.swift */; };
 		CA9DACE82C79E09600ACFE80 /* ToDoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9DACE72C79E09600ACFE80 /* ToDoTableViewCell.swift */; };
 		CA9DACEA2C79E51D00ACFE80 /* AddToDoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9DACE92C79E51D00ACFE80 /* AddToDoViewController.swift */; };
+		CA9DACEC2C7A04AA00ACFE80 /* EditToDoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9DACEB2C7A04AA00ACFE80 /* EditToDoViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +62,7 @@
 		CA9DACE12C79D84100ACFE80 /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
 		CA9DACE72C79E09600ACFE80 /* ToDoTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoTableViewCell.swift; sourceTree = "<group>"; };
 		CA9DACE92C79E51D00ACFE80 /* AddToDoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToDoViewController.swift; sourceTree = "<group>"; };
+		CA9DACEB2C7A04AA00ACFE80 /* EditToDoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditToDoViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -197,6 +199,7 @@
 				CA9DACD92C79D4DD00ACFE80 /* ToDoListViewController.swift */,
 				CA9DACE72C79E09600ACFE80 /* ToDoTableViewCell.swift */,
 				CA9DACE92C79E51D00ACFE80 /* AddToDoViewController.swift */,
+				CA9DACEB2C7A04AA00ACFE80 /* EditToDoViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -333,6 +336,7 @@
 			files = (
 				CA9DACDA2C79D4DD00ACFE80 /* ToDoListViewController.swift in Sources */,
 				CA9DACA02C79D39000ACFE80 /* AppDelegate.swift in Sources */,
+				CA9DACEC2C7A04AA00ACFE80 /* EditToDoViewController.swift in Sources */,
 				CA9DACEA2C79E51D00ACFE80 /* AddToDoViewController.swift in Sources */,
 				CA9DACA22C79D39000ACFE80 /* SceneDelegate.swift in Sources */,
 				CA9DACDC2C79D4E800ACFE80 /* ToDoListPresenter.swift in Sources */,
