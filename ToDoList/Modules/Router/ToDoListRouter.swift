@@ -9,23 +9,32 @@ import UIKit
 
 class ToDoListRouter {
     
-    static func createModule() -> ToDoListViewController {
+    weak var viewController: UIViewController?
+    
+    static func assembleModule() -> UIViewController {
         let view = ToDoListViewController()
-        let presenter = ToDoListPresenter()
         let interactor = ToDoListInteractor()
         let router = ToDoListRouter()
+        let presenter = ToDoListPresenter(view: view, interactor: interactor, router: router)
         
         view.presenter = presenter
-        presenter.view = view
-        presenter.interactor = interactor
-        presenter.router = router
         interactor.output = presenter
+        router.viewController = view
         
         return view
     }
     
-    func navigateToDetailScreen(from view: ToDoListView, with toDo: ToDoItem) {
-        // Логика навигации на экран деталей задачи
+    func navigateToAddToDo() {
+        let addToDoVC = AddToDoViewController()
+        addToDoVC.modalPresentationStyle = .fullScreen
+        viewController?.present(addToDoVC, animated: true, completion: nil)
+    }
+    
+    func navigateToEditToDo(for toDo: ToDoItem) {
+        let editToDoVC = EditToDoViewController()
+        editToDoVC.toDoItem = toDo
+        editToDoVC.modalPresentationStyle = .fullScreen
+        viewController?.present(editToDoVC, animated: true, completion: nil)
     }
 }
 

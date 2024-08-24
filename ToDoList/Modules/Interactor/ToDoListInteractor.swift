@@ -9,24 +9,41 @@ import Foundation
 
 protocol ToDoListInteractorInput {
     func fetchToDos()
-    func addToDo(title: String, description: String)
-    func updateToDo(toDo: ToDoItem)
-    func deleteToDo(id: UUID)
+    func addToDoItem(title: String, description: String, isCompleted: Bool)
+    func updateToDoItem(toDo: ToDoItem, title: String, description: String, isCompleted: Bool)
+    func deleteToDoItem(toDo: ToDoItem)
+    func toggleComplete(_ toDo: ToDoItem)
 }
 
 protocol ToDoListInteractorOutput: AnyObject {
     func didFetchToDos(_ toDos: [ToDoItem])
-    func didFailToFetchToDos(error: Error)
+    func didFailToFetchToDos(with error: Error)
+    func didUpdateToDo()
 }
 
 class ToDoListInteractor: ToDoListInteractorInput {
-    
     weak var output: ToDoListInteractorOutput?
     
     func fetchToDos() {
-        // Perform the fetch operation in a background thread
         DispatchQueue.global(qos: .background).async {
-            let toDos = CoreDataManager.shared.fetchToDos()
+            var toDos: [ToDoItem] = []
+            
+            // Check UserDefaults to see if this is the first launch
+            let hasFetchedToDos = UserDefaults.standard.bool(forKey: "hasFetchedToDos")
+            if !hasFetchedToDos {
+                CoreDataManager.shared.firstFetchToDos { result in
+                    switch result {
+                    case .success(let todos):
+                        toDos = todos
+                    case .failure(_):
+                        toDos = CoreDataManager.shared.fetchToDos()
+                    }
+                }
+                // Mark that firstFetchToDos has been called
+                UserDefaults.standard.set(true, forKey: "hasFetchedToDos")
+            } else {
+                toDos = CoreDataManager.shared.fetchToDos()
+            }
             
             DispatchQueue.main.async {
                 self.output?.didFetchToDos(toDos)
@@ -34,42 +51,40 @@ class ToDoListInteractor: ToDoListInteractorInput {
         }
     }
     
-    func addToDo(title: String, description: String) {
-        // Perform the add operation in a background thread
+    func addToDoItem(title: String, description: String, isCompleted: Bool) {
         DispatchQueue.global(qos: .background).async {
-            CoreDataManager.shared.createToDo(title: title, description: description, createdDate: Date(), isCompleted: false)
-            
-            // Notify observers about the update of a ToDo on the main thread
+            CoreDataManager.shared.createToDo(title: title, description: description, createdDate: Date(), isCompleted: isCompleted)
             DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .didUpdateToDo, object: nil)
+                self.output?.didUpdateToDo()
             }
         }
     }
     
-    func updateToDo(toDo: ToDoItem) {
-        // Perform the update operation in a background thread
+    func updateToDoItem(toDo: ToDoItem, title: String, description: String, isCompleted: Bool) {
         DispatchQueue.global(qos: .background).async {
-            CoreDataManager.shared.updateToDo(toDo: toDo, title: toDo.title ?? "", description: toDo.todoDescription, isCompleted: toDo.isCompleted)
-            
-            // Notify observers about the update of a ToDo on the main thread
+            CoreDataManager.shared.updateToDo(toDo: toDo, title: title, description: description, isCompleted: isCompleted)
             DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .didUpdateToDo, object: nil)
+                self.output?.didUpdateToDo()
             }
         }
     }
     
-    func deleteToDo(id: UUID) {
-        // Perform the delete operation in a background thread
+    func deleteToDoItem(toDo: ToDoItem) {
         DispatchQueue.global(qos: .background).async {
-            if let toDo = CoreDataManager.shared.fetchToDo(with: id) {
-                CoreDataManager.shared.deleteToDo(toDo)
-            }
-            
-            // Notify observers about the deletion of a ToDo on the main thread
+            CoreDataManager.shared.deleteToDo(toDo)
             DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .didUpdateToDo, object: nil)
+                self.output?.didUpdateToDo()
+            }
+        }
+    }
+    
+    func toggleComplete(_ toDo: ToDoItem) {
+        DispatchQueue.global(qos: .background).async {
+            toDo.isCompleted.toggle()
+//            CoreDataManager.shared.saveContext()
+            DispatchQueue.main.async {
+                self.output?.didUpdateToDo()
             }
         }
     }
 }
-

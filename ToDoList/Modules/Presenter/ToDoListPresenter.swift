@@ -12,36 +12,63 @@ protocol ToDoListView: AnyObject {
     func showError(_ error: Error)
 }
 
-class ToDoListPresenter {
+protocol ToDoListPresenterInput {
+    func viewDidLoad()
+    func fetchToDos()
+    func showAddToDo()
+    func showEditToDo(for toDo: ToDoItem)
+    func deleteToDoItem(_ toDo: ToDoItem)
+    func toggleComplete(_ toDo: ToDoItem)
+}
+
+class ToDoListPresenter: ToDoListPresenterInput, ToDoListInteractorOutput {
     
     weak var view: ToDoListView?
     var interactor: ToDoListInteractorInput?
     var router: ToDoListRouter?
     
+    init(view: ToDoListView, interactor: ToDoListInteractorInput, router: ToDoListRouter) {
+        self.view = view
+        self.interactor = interactor
+        self.router = router
+    }
+    
     func viewDidLoad() {
+        fetchToDos()
+    }
+    
+    func fetchToDos() {
         interactor?.fetchToDos()
     }
     
-    func addNewToDo(title: String, description: String) {
-        interactor?.addToDo(title: title, description: description)
+    func showAddToDo() {
+        router?.navigateToAddToDo()
     }
     
-    func updateExistingToDo(toDo: ToDoItem) {
-        interactor?.updateToDo(toDo: toDo)
+    func showEditToDo(for toDo: ToDoItem) {
+        router?.navigateToEditToDo(for: toDo)
     }
     
-    func deleteToDoById(_ id: UUID) {
-        interactor?.deleteToDo(id: id)
+    func deleteToDoItem(_ toDo: ToDoItem) {
+        interactor?.deleteToDoItem(toDo: toDo)
     }
-}
-
-extension ToDoListPresenter: ToDoListInteractorOutput {
+    
+    func toggleComplete(_ toDo: ToDoItem) {
+        interactor?.toggleComplete(toDo)
+    }
+    
+    // MARK: - Interactor Output
+    
     func didFetchToDos(_ toDos: [ToDoItem]) {
         view?.showToDos(toDos)
     }
     
-    func didFailToFetchToDos(error: Error) {
+    func didFailToFetchToDos(with error: Error) {
         view?.showError(error)
+    }
+    
+    func didUpdateToDo() {
+        fetchToDos()
     }
 }
 
