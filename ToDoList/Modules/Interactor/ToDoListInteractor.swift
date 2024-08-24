@@ -24,8 +24,10 @@ class ToDoListInteractor: ToDoListInteractorInput {
     weak var output: ToDoListInteractorOutput?
     
     func fetchToDos() {
+        // Perform the fetch operation in a background thread
         DispatchQueue.global(qos: .background).async {
             let toDos = CoreDataManager.shared.fetchToDos()
+            
             DispatchQueue.main.async {
                 self.output?.didFetchToDos(toDos)
             }
@@ -33,25 +35,40 @@ class ToDoListInteractor: ToDoListInteractorInput {
     }
     
     func addToDo(title: String, description: String) {
+        // Perform the add operation in a background thread
         DispatchQueue.global(qos: .background).async {
             CoreDataManager.shared.createToDo(title: title, description: description, createdDate: Date(), isCompleted: false)
-            self.fetchToDos()
+            
+            // Notify observers about the update of a ToDo on the main thread
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .didUpdateToDo, object: nil)
+            }
         }
     }
     
     func updateToDo(toDo: ToDoItem) {
+        // Perform the update operation in a background thread
         DispatchQueue.global(qos: .background).async {
             CoreDataManager.shared.updateToDo(toDo: toDo, title: toDo.title ?? "", description: toDo.todoDescription, isCompleted: toDo.isCompleted)
-            self.fetchToDos()
+            
+            // Notify observers about the update of a ToDo on the main thread
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .didUpdateToDo, object: nil)
+            }
         }
     }
     
     func deleteToDo(id: UUID) {
+        // Perform the delete operation in a background thread
         DispatchQueue.global(qos: .background).async {
             if let toDo = CoreDataManager.shared.fetchToDo(with: id) {
                 CoreDataManager.shared.deleteToDo(toDo)
             }
-            self.fetchToDos()
+            
+            // Notify observers about the deletion of a ToDo on the main thread
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .didUpdateToDo, object: nil)
+            }
         }
     }
 }

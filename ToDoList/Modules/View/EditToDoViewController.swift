@@ -1,5 +1,5 @@
 //
-//  AddToDoViewController.swift
+//  EditToDoViewController.swift
 //  ToDoList
 //
 //  Created by Алёна Максимова on 24.08.2024.
@@ -7,11 +7,13 @@
 
 import UIKit
 
-class AddToDoViewController: UIViewController {
-
+class EditToDoViewController: UIViewController {
+    
+    var toDoItem: ToDoItem? // The item being edited
+    
     private let titleTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Enter title"
+        textField.placeholder = "Title"
         textField.borderStyle = .roundedRect
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
@@ -39,28 +41,18 @@ class AddToDoViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Add New ToDo"
         view.backgroundColor = .white
+        title = "Edit ToDo"
         
         view.addSubview(titleTextField)
         view.addSubview(descriptionTextView)
         view.addSubview(saveButton)
         
-        NSLayoutConstraint.activate([
-            titleTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            titleTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            titleTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            
-            descriptionTextView.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 20),
-            descriptionTextView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            descriptionTextView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            descriptionTextView.heightAnchor.constraint(equalToConstant: 100),
-            
-            saveButton.topAnchor.constraint(equalTo: descriptionTextView.bottomAnchor, constant: 20),
-            saveButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            saveButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            saveButton.heightAnchor.constraint(equalToConstant: 32),
-        ])
+        setupConstraints()
+        
+        // Set initial values
+        titleTextField.text = toDoItem?.title
+        descriptionTextView.text = toDoItem?.todoDescription
         
         saveButton.addTarget(self, action: #selector(saveToDo), for: .touchUpInside)
         
@@ -70,15 +62,37 @@ class AddToDoViewController: UIViewController {
         view.addGestureRecognizer(tapGestureRecognizer)
     }
     
+    private func setupConstraints() {
+        NSLayoutConstraint.activate([
+            titleTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            titleTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            titleTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            
+            descriptionTextView.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 20),
+            descriptionTextView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            descriptionTextView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            descriptionTextView.heightAnchor.constraint(equalToConstant: 150),
+            
+            saveButton.topAnchor.constraint(equalTo: descriptionTextView.bottomAnchor, constant: 20),
+            saveButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            saveButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            saveButton.heightAnchor.constraint(equalToConstant: 32),
+        ])
+    }
+    
     @objc private func saveToDo() {
-        guard let title = titleTextField.text, !title.isEmpty else { return }
+        guard let toDoItem = toDoItem else { return }
+        
+        // Get updated values
+        let newTitle = titleTextField.text ?? ""
+        let newDescription = descriptionTextView.text
         
         DispatchQueue.global(qos: .background).async { [weak self] in
-            CoreDataManager.shared.createToDo(title: title, description: self?.descriptionTextView.text, createdDate: Date(), isCompleted: false)
+            CoreDataManager.shared.updateToDo(toDo: toDoItem, title: newTitle, description: newDescription, isCompleted: toDoItem.isCompleted)
             
             DispatchQueue.main.async {
-                // Notify observers about the addition of a new ToDo
-                NotificationCenter.default.post(name: .didAddNewToDo, object: nil)
+                // Notify observers about the update of a ToDo
+                NotificationCenter.default.post(name: .didUpdateToDo, object: nil)
                 self?.dismiss(animated: true, completion: nil)
             }
         }
@@ -89,4 +103,3 @@ class AddToDoViewController: UIViewController {
         descriptionTextView.resignFirstResponder()
     }
 }
-

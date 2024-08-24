@@ -34,24 +34,65 @@ class ToDoListViewController: UIViewController, ToDoListView {
         tableView.dataSource = self
         
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.topAnchor),
-            tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            tableView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
         
-        fetchToDos()
+        // Check UserDefaults to see if this is the first launch
+        let hasFetchedToDos = UserDefaults.standard.bool(forKey: "hasFetchedToDos")
+        if !hasFetchedToDos {
+            firstFetchToDos()
+            // Mark that firstFetchToDos has been called
+            UserDefaults.standard.set(true, forKey: "hasFetchedToDos")
+        } else {
+            fetchToDos()
+        }
+        
         
         let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addToDo))
         navigationItem.rightBarButtonItem = addButton
         
         NotificationCenter.default.addObserver(self, selector: #selector(fetchToDos), name: .didAddNewToDo, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(fetchToDos), name: .didUpdateToDo, object: nil)
+    }
+    
+    @objc private func firstFetchToDos() {
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            CoreDataManager.shared.firstFetchToDos { result in
+                switch result {
+                case .success(let todos):
+                    self?.todos.append(contentsOf: todos)
+                    
+                    // Reload the table view on the main thread
+                    DispatchQueue.main.async {
+                        self?.tableView.reloadData()
+                    }
+                    
+                case .failure(let error):
+                    // Handle the error (e.g., show an alert)
+                    print("Error: \(error.localizedDescription)")
+                    
+                    // Optionally reload the table view with an error state
+                    DispatchQueue.main.async {
+                        self?.tableView.reloadData()
+                    }
+                }
+            }
+        }
     }
     
     @objc private func fetchToDos() {
-        // Assuming CoreDataManager is set up to fetch ToDo items
-        todos = CoreDataManager.shared.fetchToDos()
-        tableView.reloadData()
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            // Assuming CoreDataManager is set up to fetch ToDo items
+            let fetchedToDos = CoreDataManager.shared.fetchToDos()
+            
+            DispatchQueue.main.async {
+                self?.todos = fetchedToDos
+                self?.tableView.reloadData()
+            }
+        }
     }
     
     @objc private func addToDo() {
@@ -68,11 +109,11 @@ class ToDoListViewController: UIViewController, ToDoListView {
     func showError(_ error: Error) {
         // Display the error message to the user
     }
-   
+    
 }
 
 extension ToDoListViewController: UITableViewDataSource, UITableViewDelegate {
-
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return todos.count
     }
@@ -87,11 +128,74 @@ extension ToDoListViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // Handle cell selection if necessary
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        // Get the selected ToDo item
+        let selectedToDo = todos[indexPath.row]
+        
+        // Create the edit view controller
+        let editToDoVC = EditToDoViewController()
+        editToDoVC.toDoItem = selectedToDo
+        
+        let navController = UINavigationController(rootViewController: editToDoVC)
+        present(navController, animated: true, completion: nil)
+    }
+    
+    // Swipe to delete functionality using trailing swipe actions
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] _, _, completionHandler in
+            guard let self = self else { return }
+            
+            let toDoToDelete = self.todos[indexPath.row]
+            
+            DispatchQueue.global(qos: .background).async {
+                CoreDataManager.shared.deleteToDo(toDoToDelete)
+                
+                DispatchQueue.main.async {
+                    self.todos.remove(at: indexPath.row)
+                    tableView.deleteRows(at: [indexPath], with: .fade)
+                }
+            }
+            
+            completionHandler(true)
+        }
+        
+        deleteAction.backgroundColor = .systemRed
+        
+        let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
+        return configuration
+    }
+    
+    // Swipe to complete functionality using leading swipe actions
+    func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let toDo = todos[indexPath.row]
+        let title = toDo.isCompleted ? "Not Completed" : "Completed"
+        
+        let completeAction = UIContextualAction(style: .normal, title: title) { [weak self] _, _, completionHandler in
+            guard self != nil else { return }
+            
+            DispatchQueue.global(qos: .background).async {
+                // Toggle completion status
+                toDo.isCompleted.toggle()
+                CoreDataManager.shared.updateToDo(toDo: toDo, title: toDo.title ?? "", description: toDo.todoDescription, isCompleted: toDo.isCompleted)
+                
+                DispatchQueue.main.async {
+                    // Reload the specific row
+                    tableView.reloadRows(at: [indexPath], with: .automatic)
+                }
+            }
+            
+            completionHandler(true)
+        }
+        
+        completeAction.backgroundColor = toDo.isCompleted ? .systemOrange : .systemGreen
+        
+        let configuration = UISwipeActionsConfiguration(actions: [completeAction])
+        return configuration
     }
 }
 
 extension Notification.Name {
     static let didAddNewToDo = Notification.Name("didAddNewToDo")
+    static let didUpdateToDo = Notification.Name("didUpdateToDo")
 }

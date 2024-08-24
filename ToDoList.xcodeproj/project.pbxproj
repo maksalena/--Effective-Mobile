@@ -22,6 +22,8 @@
 		CA9DACE22C79D84100ACFE80 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9DACE12C79D84100ACFE80 /* CoreDataManager.swift */; };
 		CA9DACE82C79E09600ACFE80 /* ToDoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9DACE72C79E09600ACFE80 /* ToDoTableViewCell.swift */; };
 		CA9DACEA2C79E51D00ACFE80 /* AddToDoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9DACE92C79E51D00ACFE80 /* AddToDoViewController.swift */; };
+		CA9DACEC2C7A04AA00ACFE80 /* EditToDoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9DACEB2C7A04AA00ACFE80 /* EditToDoViewController.swift */; };
+		CA9DACF22C7A359100ACFE80 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = CA9DACF12C7A359100ACFE80 /* Alamofire */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +63,7 @@
 		CA9DACE12C79D84100ACFE80 /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
 		CA9DACE72C79E09600ACFE80 /* ToDoTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoTableViewCell.swift; sourceTree = "<group>"; };
 		CA9DACE92C79E51D00ACFE80 /* AddToDoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToDoViewController.swift; sourceTree = "<group>"; };
+		CA9DACEB2C7A04AA00ACFE80 /* EditToDoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditToDoViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +71,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CA9DACF22C7A359100ACFE80 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -197,6 +201,7 @@
 				CA9DACD92C79D4DD00ACFE80 /* ToDoListViewController.swift */,
 				CA9DACE72C79E09600ACFE80 /* ToDoTableViewCell.swift */,
 				CA9DACE92C79E51D00ACFE80 /* AddToDoViewController.swift */,
+				CA9DACEB2C7A04AA00ACFE80 /* EditToDoViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -217,6 +222,9 @@
 			dependencies = (
 			);
 			name = ToDoList;
+			packageProductDependencies = (
+				CA9DACF12C7A359100ACFE80 /* Alamofire */,
+			);
 			productName = ToDoList;
 			productReference = CA9DAC9C2C79D39000ACFE80 /* ToDoList.app */;
 			productType = "com.apple.product-type.application";
@@ -289,6 +297,9 @@
 				Base,
 			);
 			mainGroup = CA9DAC932C79D39000ACFE80;
+			packageReferences = (
+				CA9DACF02C7A359100ACFE80 /* XCRemoteSwiftPackageReference "Alamofire" */,
+			);
 			productRefGroup = CA9DAC9D2C79D39000ACFE80 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -333,6 +344,7 @@
 			files = (
 				CA9DACDA2C79D4DD00ACFE80 /* ToDoListViewController.swift in Sources */,
 				CA9DACA02C79D39000ACFE80 /* AppDelegate.swift in Sources */,
+				CA9DACEC2C7A04AA00ACFE80 /* EditToDoViewController.swift in Sources */,
 				CA9DACEA2C79E51D00ACFE80 /* AddToDoViewController.swift in Sources */,
 				CA9DACA22C79D39000ACFE80 /* SceneDelegate.swift in Sources */,
 				CA9DACDC2C79D4E800ACFE80 /* ToDoListPresenter.swift in Sources */,
@@ -677,6 +689,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		CA9DACF02C7A359100ACFE80 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.9.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CA9DACF12C7A359100ACFE80 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CA9DACF02C7A359100ACFE80 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		CA9DACA82C79D39000ACFE80 /* ToDoList.xcdatamodeld */ = {
