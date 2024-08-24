@@ -80,7 +80,7 @@ class ToDoTableViewCell: UITableViewCell {
         titleLabel.text = todo.title
         descriptionLabel.text = todo.todoDescription
         completedLabel.text = todo.isCompleted ? "Completed" : "Not Completed"
-        completedLabel.textColor = todo.isCompleted ? .green : .red
+        completedLabel.textColor = todo.isCompleted ? .systemGreen : .systemRed
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .short
