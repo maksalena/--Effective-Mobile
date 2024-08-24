@@ -9,7 +9,7 @@ import UIKit
 
 class ToDoListViewController: UIViewController, ToDoListView {
     
-    var presenter: ToDoListPresenterInput?
+    var presenter: ToDoListPresenter?
     var toDos: [ToDoItem] = []
     
     // Create a UITableView
@@ -42,9 +42,6 @@ class ToDoListViewController: UIViewController, ToDoListView {
         
         let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addToDo))
         navigationItem.rightBarButtonItem = addButton
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(fetchToDos), name: .didAddNewToDo, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(fetchToDos), name: .didUpdateToDo, object: nil)
     }
     
     @objc private func fetchToDos() {
@@ -129,7 +126,8 @@ extension ToDoListViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
-extension Notification.Name {
-    static let didAddNewToDo = Notification.Name("didAddNewToDo")
-    static let didUpdateToDo = Notification.Name("didUpdateToDo")
+extension ToDoListViewController{
+    func didAddToDo() {
+        presenter?.fetchToDos()
+        }
 }

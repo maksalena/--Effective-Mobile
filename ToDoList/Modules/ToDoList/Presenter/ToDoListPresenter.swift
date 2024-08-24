@@ -42,11 +42,11 @@ class ToDoListPresenter: ToDoListPresenterInput, ToDoListInteractorOutput {
     }
     
     func showAddToDo() {
-        router?.navigateToAddToDo()
+        router?.navigateToAddToDo(rootPresenter: self)
     }
     
     func showEditToDo(for toDo: ToDoItem) {
-        router?.navigateToEditToDo(for: toDo)
+        router?.navigateToEditToDo(for: toDo, rootPresenter: self)
     }
     
     func deleteToDoItem(_ toDo: ToDoItem) {

@@ -1,5 +1,5 @@
 //
-//  AddToDoViewController.swift
+//  EditToDoViewController.swift
 //  ToDoList
 //
 //  Created by Алёна Максимова on 24.08.2024.
@@ -7,11 +7,20 @@
 
 import UIKit
 
-class AddToDoViewController: UIViewController {
+protocol EditToDoView: AnyObject {
+    func displaySuccess()
+    func displayError(_ message: String)
+}
 
+class EditToDoViewController: UIViewController {
+    
+    var presenter: EditToDoPresenter?
+    var rootPresenter: ToDoListPresenter?
+    var toDoItem: ToDoItem?
+    
     private let titleTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Enter title"
+        textField.placeholder = "Title"
         textField.borderStyle = .roundedRect
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
@@ -39,13 +48,26 @@ class AddToDoViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Add New ToDo"
+        title = "Edit ToDo"
         view.backgroundColor = .white
         
         view.addSubview(titleTextField)
         view.addSubview(descriptionTextView)
         view.addSubview(saveButton)
         
+        setupConstraints()
+        
+        titleTextField.text = toDoItem?.title
+        descriptionTextView.text = toDoItem?.todoDescription
+        
+        saveButton.addTarget(self, action: #selector(saveToDo), for: .touchUpInside)
+        
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGestureRecognizer.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGestureRecognizer)
+    }
+    
+    private func setupConstraints() {
         NSLayoutConstraint.activate([
             titleTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             titleTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -54,34 +76,18 @@ class AddToDoViewController: UIViewController {
             descriptionTextView.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 20),
             descriptionTextView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             descriptionTextView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            descriptionTextView.heightAnchor.constraint(equalToConstant: 100),
+            descriptionTextView.heightAnchor.constraint(equalToConstant: 150),
             
             saveButton.topAnchor.constraint(equalTo: descriptionTextView.bottomAnchor, constant: 20),
             saveButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             saveButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             saveButton.heightAnchor.constraint(equalToConstant: 32),
         ])
-        
-        saveButton.addTarget(self, action: #selector(saveToDo), for: .touchUpInside)
-        
-        // Add tap gesture recognizer to dismiss keyboard
-        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-        tapGestureRecognizer.cancelsTouchesInView = false
-        view.addGestureRecognizer(tapGestureRecognizer)
     }
     
     @objc private func saveToDo() {
-        guard let title = titleTextField.text, !title.isEmpty else { return }
-        
-        DispatchQueue.global(qos: .background).async { [weak self] in
-            CoreDataManager.shared.createToDo(title: title, description: self?.descriptionTextView.text, createdDate: Date(), isCompleted: false)
-            
-            DispatchQueue.main.async {
-                // Notify observers about the addition of a new ToDo
-                NotificationCenter.default.post(name: .didAddNewToDo, object: nil)
-                self?.dismiss(animated: true, completion: nil)
-            }
-        }
+        guard let toDoItem = toDoItem else { return }
+        presenter?.saveToDo(toDoItem: toDoItem, title: titleTextField.text ?? "", description: descriptionTextView.text ?? "")
     }
     
     @objc private func dismissKeyboard() {
@@ -90,3 +96,12 @@ class AddToDoViewController: UIViewController {
     }
 }
 
+extension EditToDoViewController: EditToDoView {
+    func displaySuccess() {
+        dismiss(animated: true, completion: { self.rootPresenter?.fetchToDos() })
+    }
+    
+    func displayError(_ message: String) {
+        // Display error message
+    }
+}
