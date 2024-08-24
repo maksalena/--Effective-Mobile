@@ -87,13 +87,14 @@ class EditToDoViewController: UIViewController {
         let newTitle = titleTextField.text ?? ""
         let newDescription = descriptionTextView.text
         
-        // Update the ToDo item
-        CoreDataManager.shared.updateToDo(toDo: toDoItem, title: newTitle, description: newDescription, isCompleted: toDoItem.isCompleted)
-        
-        // Dismiss the edit view controller
-        dismiss(animated: true) {
-            // Notify observers that a ToDo item was updated
-            NotificationCenter.default.post(name: .didUpdateToDo, object: nil)
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            CoreDataManager.shared.updateToDo(toDo: toDoItem, title: newTitle, description: newDescription, isCompleted: toDoItem.isCompleted)
+            
+            DispatchQueue.main.async {
+                // Notify observers about the update of a ToDo
+                NotificationCenter.default.post(name: .didUpdateToDo, object: nil)
+                self?.dismiss(animated: true, completion: nil)
+            }
         }
     }
     
