@@ -7,6 +7,9 @@
 
 import Foundation
 
+
+// MARK: - Protocols
+
 protocol ToDoListInteractorInput {
     func fetchToDos()
     func addToDoItem(title: String, description: String, isCompleted: Bool)
@@ -17,9 +20,11 @@ protocol ToDoListInteractorInput {
 
 protocol ToDoListInteractorOutput: AnyObject {
     func didFetchToDos(_ toDos: [ToDoItem])
-    func didFailToFetchToDos(with error: Error)
     func didUpdateToDo()
 }
+
+
+// MARK: - ToDoListInteractor
 
 class ToDoListInteractor: ToDoListInteractorInput {
     weak var output: ToDoListInteractorOutput?
@@ -31,6 +36,7 @@ class ToDoListInteractor: ToDoListInteractorInput {
             // Check UserDefaults to see if this is the first launch
             let hasFetchedToDos = UserDefaults.standard.bool(forKey: "hasFetchedToDos")
             if !hasFetchedToDos {
+                // Fetch todos from API
                 CoreDataManager.shared.firstFetchToDos { result in
                     switch result {
                     case .success(let todos):
@@ -81,7 +87,6 @@ class ToDoListInteractor: ToDoListInteractorInput {
     func toggleComplete(_ toDo: ToDoItem) {
         DispatchQueue.global(qos: .background).async {
             toDo.isCompleted.toggle()
-//            CoreDataManager.shared.saveContext()
             DispatchQueue.main.async {
                 self.output?.didUpdateToDo()
             }

@@ -7,6 +7,9 @@
 
 import Foundation
 
+
+// MARK: - Protocols
+
 protocol ToDoListView: AnyObject {
     func showToDos(_ toDos: [ToDoItem])
     func showError(_ error: Error)
@@ -21,7 +24,10 @@ protocol ToDoListPresenterInput {
     func toggleComplete(_ toDo: ToDoItem)
 }
 
-class ToDoListPresenter: ToDoListPresenterInput, ToDoListInteractorOutput {
+
+// MARK: - Presenter
+
+class ToDoListPresenter {
     
     weak var view: ToDoListView?
     var interactor: ToDoListInteractorInput?
@@ -32,7 +38,12 @@ class ToDoListPresenter: ToDoListPresenterInput, ToDoListInteractorOutput {
         self.interactor = interactor
         self.router = router
     }
-    
+}
+
+
+// MARK: - Interactor Input
+
+extension ToDoListPresenter: ToDoListPresenterInput {
     func viewDidLoad() {
         fetchToDos()
     }
@@ -56,9 +67,12 @@ class ToDoListPresenter: ToDoListPresenterInput, ToDoListInteractorOutput {
     func toggleComplete(_ toDo: ToDoItem) {
         interactor?.toggleComplete(toDo)
     }
-    
-    // MARK: - Interactor Output
-    
+}
+
+
+// MARK: - Interactor Output
+
+extension ToDoListPresenter: ToDoListInteractorOutput {
     func didFetchToDos(_ toDos: [ToDoItem]) {
         view?.showToDos(toDos)
     }
@@ -71,4 +85,3 @@ class ToDoListPresenter: ToDoListPresenterInput, ToDoListInteractorOutput {
         fetchToDos()
     }
 }
-

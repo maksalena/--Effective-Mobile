@@ -30,6 +30,7 @@
 		CA9DAD032C7A709A00ACFE80 /* EditToDoInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9DAD022C7A709A00ACFE80 /* EditToDoInteractor.swift */; };
 		CA9DAD062C7A710200ACFE80 /* EditToDoPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9DAD052C7A710200ACFE80 /* EditToDoPresenter.swift */; };
 		CA9DAD092C7A713500ACFE80 /* EditToDoRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9DAD082C7A713500ACFE80 /* EditToDoRouter.swift */; };
+		CA9DAD0B2C7B157500ACFE80 /* ToDoEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9DAD0A2C7B157500ACFE80 /* ToDoEntity.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,6 +77,7 @@
 		CA9DAD022C7A709A00ACFE80 /* EditToDoInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditToDoInteractor.swift; sourceTree = "<group>"; };
 		CA9DAD052C7A710200ACFE80 /* EditToDoPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditToDoPresenter.swift; sourceTree = "<group>"; };
 		CA9DAD082C7A713500ACFE80 /* EditToDoRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditToDoRouter.swift; sourceTree = "<group>"; };
+		CA9DAD0A2C7B157500ACFE80 /* ToDoEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoEntity.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,8 +130,8 @@
 			isa = PBXGroup;
 			children = (
 				CA9DACD32C79D48B00ACFE80 /* Modules */,
-				CA9DACB02C79D39000ACFE80 /* Info.plist */,
 				CA9DACD22C79D46C00ACFE80 /* App */,
+				CA9DACB02C79D39000ACFE80 /* Info.plist */,
 			);
 			path = ToDoList;
 			sourceTree = "<group>";
@@ -185,6 +187,7 @@
 			isa = PBXGroup;
 			children = (
 				CA9DACA82C79D39000ACFE80 /* ToDoList.xcdatamodeld */,
+				CA9DAD0A2C7B157500ACFE80 /* ToDoEntity.swift */,
 			);
 			path = Entity;
 			sourceTree = "<group>";
@@ -218,8 +221,8 @@
 			isa = PBXGroup;
 			children = (
 				CA9DACD82C79D4D100ACFE80 /* View */,
-				CA9DACD72C79D4C900ACFE80 /* Presenter */,
 				CA9DACD62C79D4C100ACFE80 /* Interactor */,
+				CA9DACD72C79D4C900ACFE80 /* Presenter */,
 				CA9DACD52C79D4B700ACFE80 /* Entity */,
 				CA9DACD42C79D4AE00ACFE80 /* Router */,
 			);
@@ -229,10 +232,10 @@
 		CA9DACF42C7A657000ACFE80 /* AddToDo */ = {
 			isa = PBXGroup;
 			children = (
-				CA9DACFC2C7A661E00ACFE80 /* Router */,
-				CA9DACF92C7A65FE00ACFE80 /* Presenter */,
-				CA9DACF62C7A65CE00ACFE80 /* Interactor */,
 				CA9DACF52C7A657C00ACFE80 /* View */,
+				CA9DACF62C7A65CE00ACFE80 /* Interactor */,
+				CA9DACF92C7A65FE00ACFE80 /* Presenter */,
+				CA9DACFC2C7A661E00ACFE80 /* Router */,
 			);
 			path = AddToDo;
 			sourceTree = "<group>";
@@ -272,10 +275,10 @@
 		CA9DACFF2C7A707000ACFE80 /* EditToDo */ = {
 			isa = PBXGroup;
 			children = (
-				CA9DAD072C7A712B00ACFE80 /* Router */,
-				CA9DAD042C7A70F000ACFE80 /* Presenter */,
-				CA9DAD012C7A708600ACFE80 /* Interactor */,
 				CA9DAD002C7A708000ACFE80 /* View */,
+				CA9DAD012C7A708600ACFE80 /* Interactor */,
+				CA9DAD042C7A70F000ACFE80 /* Presenter */,
+				CA9DAD072C7A712B00ACFE80 /* Router */,
 			);
 			path = EditToDo;
 			sourceTree = "<group>";
@@ -464,6 +467,7 @@
 				CA9DACE82C79E09600ACFE80 /* ToDoTableViewCell.swift in Sources */,
 				CA9DACFB2C7A660A00ACFE80 /* AddToDoPresenter.swift in Sources */,
 				CA9DACE22C79D84100ACFE80 /* CoreDataManager.swift in Sources */,
+				CA9DAD0B2C7B157500ACFE80 /* ToDoEntity.swift in Sources */,
 				CA9DACAA2C79D39000ACFE80 /* ToDoList.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

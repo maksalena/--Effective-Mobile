@@ -7,9 +7,15 @@
 
 import Foundation
 
+
+// MARK: - Protocols
+
 protocol EditToDoPresenter: AnyObject {
     func saveToDo(toDoItem: ToDoItem, title: String, description: String)
 }
+
+
+// MARK: - Presenter
 
 class EditToDoPresenterImpl: EditToDoPresenter {
     
@@ -25,6 +31,9 @@ class EditToDoPresenterImpl: EditToDoPresenter {
         interactor.updateToDoItem(toDo: toDoItem, title: title, description: description, isCompleted: toDoItem.isCompleted)
     }
 }
+
+
+// MARK: - EditToDoInteractorOutput
 
 extension EditToDoPresenterImpl: EditToDoInteractorOutput {
     func didUpdateToDo() {

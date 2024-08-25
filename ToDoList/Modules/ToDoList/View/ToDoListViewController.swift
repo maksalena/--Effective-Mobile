@@ -7,12 +7,15 @@
 
 import UIKit
 
-class ToDoListViewController: UIViewController, ToDoListView {
+
+// MARK: - ViewController
+
+class ToDoListViewController: UIViewController {
     
     var presenter: ToDoListPresenter?
     var toDos: [ToDoItem] = []
     
-    // Create a UITableView
+    // UITableView
     private let tableView: UITableView = {
         let table = UITableView()
         table.translatesAutoresizingMaskIntoConstraints = false
@@ -51,7 +54,12 @@ class ToDoListViewController: UIViewController, ToDoListView {
     @objc private func addToDo() {
         presenter?.showAddToDo()
     }
-    
+}
+
+
+// MARK: - ToDoListView
+
+extension ToDoListViewController: ToDoListView {
     func showToDos(_ toDos: [ToDoItem]) {
         self.toDos = toDos
         DispatchQueue.main.async {
@@ -60,11 +68,14 @@ class ToDoListViewController: UIViewController, ToDoListView {
     }
     
     func showError(_ error: Error) {
-        // Display the error message to the user
+        print("Error showing todos.")
     }
 }
 
-extension ToDoListViewController: UITableViewDataSource, UITableViewDelegate {
+
+// MARK: -  UITableViewDataSource
+
+extension ToDoListViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return toDos.count
@@ -74,18 +85,22 @@ extension ToDoListViewController: UITableViewDataSource, UITableViewDelegate {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ToDoTableViewCell.identifier, for: indexPath) as? ToDoTableViewCell else {
             return UITableViewCell()
         }
+        
         let todo = toDos[indexPath.row]
         cell.configure(with: todo)
         return cell
     }
+}
+
+
+// MARK: - UITableViewDelegate
+
+extension ToDoListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        // Get the selected ToDo item
         let selectedToDo = toDos[indexPath.row]
-        
-        // Create the edit view controller
         presenter?.showEditToDo(for: selectedToDo)
     }
     
@@ -126,8 +141,11 @@ extension ToDoListViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
-extension ToDoListViewController{
+
+// MARK: - AddToDo
+
+extension ToDoListViewController {
     func didAddToDo() {
         presenter?.fetchToDos()
-        }
+    }
 }

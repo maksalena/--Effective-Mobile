@@ -7,6 +7,9 @@
 
 import Foundation
 
+
+// MARK: - Protocols
+
 protocol EditToDoInteractorInput {
     func updateToDoItem(toDo: ToDoItem, title: String, description: String, isCompleted: Bool)
 }
@@ -15,6 +18,9 @@ protocol EditToDoInteractorOutput: AnyObject {
     func didUpdateToDo()
     func didFailToUpdateToDo(with error: Error)
 }
+
+
+// MARK: - Interactor
 
 class EditToDoInteractor: EditToDoInteractorInput {
     weak var output: EditToDoInteractorOutput?
@@ -27,7 +33,6 @@ class EditToDoInteractor: EditToDoInteractorInput {
                 self?.output?.didUpdateToDo()
             }
         }
-        
     }
 }
 

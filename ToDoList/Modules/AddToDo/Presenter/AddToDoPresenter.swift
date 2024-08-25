@@ -7,9 +7,15 @@
 
 import Foundation
 
+
+// MARK: - Protocols
+
 protocol AddToDoPresenter: AnyObject {
     func saveToDo(title: String, description: String)
 }
+
+
+// MARK: - Presenter
 
 class AddToDoPresenterImpl: AddToDoPresenter {
     
@@ -25,6 +31,9 @@ class AddToDoPresenterImpl: AddToDoPresenter {
         interactor.addToDoItem(title: title, description: description)
     }
 }
+
+
+// MARK: - AddToDoInteractorOutput
 
 extension AddToDoPresenterImpl: AddToDoInteractorOutput {
     func didAddToDo() {

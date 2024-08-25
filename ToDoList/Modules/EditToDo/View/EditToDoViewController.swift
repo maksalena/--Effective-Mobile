@@ -7,10 +7,16 @@
 
 import UIKit
 
+
+// MARK: - Protocols
+
 protocol EditToDoView: AnyObject {
     func displaySuccess()
     func displayError(_ message: String)
 }
+
+
+// MARK: - ViewController
 
 class EditToDoViewController: UIViewController {
     
@@ -96,12 +102,14 @@ class EditToDoViewController: UIViewController {
     }
 }
 
+
+// MARK: - EditToDoView
 extension EditToDoViewController: EditToDoView {
     func displaySuccess() {
         dismiss(animated: true, completion: { self.rootPresenter?.fetchToDos() })
     }
     
     func displayError(_ message: String) {
-        // Display error message
+        print("Error editing todo.")
     }
 }

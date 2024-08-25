@@ -7,10 +7,16 @@
 
 import UIKit
 
+
+// MARK: - Protocols
+
 protocol AddToDoView: AnyObject {
     func displaySuccess()
     func displayError(_ message: String)
 }
+
+
+// MARK: - ViewController
 
 class AddToDoViewController: UIViewController {
     
@@ -95,12 +101,15 @@ class AddToDoViewController: UIViewController {
     }
 }
 
+
+// MARK: - AddToDoView
+
 extension AddToDoViewController: AddToDoView {
     func displaySuccess() {
         dismiss(animated: true, completion: { self.rootPresenter?.fetchToDos() })
     }
     
     func displayError(_ message: String) {
-        // Display error message
+        print("Error adding todo")
     }
 }
