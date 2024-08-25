@@ -1,5 +1,5 @@
 //
-//  EditToDoViewController.swift
+//  AddToDoViewController.swift
 //  ToDoList
 //
 //  Created by Алёна Максимова on 24.08.2024.
@@ -7,13 +7,25 @@
 
 import UIKit
 
-class EditToDoViewController: UIViewController {
+
+// MARK: - Protocols
+
+protocol AddToDoView: AnyObject {
+    func displaySuccess()
+    func displayError(_ message: String)
+}
+
+
+// MARK: - ViewController
+
+class AddToDoViewController: UIViewController {
     
-    var toDoItem: ToDoItem? // The item being edited
+    var presenter: AddToDoPresenter?
+    var rootPresenter: ToDoListPresenter?
     
     private let titleTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Title"
+        textField.placeholder = "Enter title"
         textField.borderStyle = .roundedRect
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
@@ -41,8 +53,8 @@ class EditToDoViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        title = "Add New ToDo"
         view.backgroundColor = .white
-        title = "Edit ToDo"
         
         view.addSubview(titleTextField)
         view.addSubview(descriptionTextView)
@@ -50,13 +62,8 @@ class EditToDoViewController: UIViewController {
         
         setupConstraints()
         
-        // Set initial values
-        titleTextField.text = toDoItem?.title
-        descriptionTextView.text = toDoItem?.todoDescription
-        
         saveButton.addTarget(self, action: #selector(saveToDo), for: .touchUpInside)
         
-        // Add tap gesture recognizer to dismiss keyboard
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tapGestureRecognizer.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGestureRecognizer)
@@ -71,7 +78,7 @@ class EditToDoViewController: UIViewController {
             descriptionTextView.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 20),
             descriptionTextView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             descriptionTextView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            descriptionTextView.heightAnchor.constraint(equalToConstant: 150),
+            descriptionTextView.heightAnchor.constraint(equalToConstant: 100),
             
             saveButton.topAnchor.constraint(equalTo: descriptionTextView.bottomAnchor, constant: 20),
             saveButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -81,25 +88,28 @@ class EditToDoViewController: UIViewController {
     }
     
     @objc private func saveToDo() {
-        guard let toDoItem = toDoItem else { return }
-        
-        // Get updated values
-        let newTitle = titleTextField.text ?? ""
-        let newDescription = descriptionTextView.text
-        
-        DispatchQueue.global(qos: .background).async { [weak self] in
-            CoreDataManager.shared.updateToDo(toDo: toDoItem, title: newTitle, description: newDescription, isCompleted: toDoItem.isCompleted)
-            
-            DispatchQueue.main.async {
-                // Notify observers about the update of a ToDo
-                NotificationCenter.default.post(name: .didUpdateToDo, object: nil)
-                self?.dismiss(animated: true, completion: nil)
-            }
+        guard let title = titleTextField.text, !title.isEmpty else {
+            displayError("Title cannot be empty")
+            return
         }
+        presenter?.saveToDo(title: title, description: descriptionTextView.text ?? "")
     }
     
     @objc private func dismissKeyboard() {
         titleTextField.resignFirstResponder()
         descriptionTextView.resignFirstResponder()
+    }
+}
+
+
+// MARK: - AddToDoView
+
+extension AddToDoViewController: AddToDoView {
+    func displaySuccess() {
+        dismiss(animated: true, completion: { self.rootPresenter?.fetchToDos() })
+    }
+    
+    func displayError(_ message: String) {
+        print("Error adding todo")
     }
 }

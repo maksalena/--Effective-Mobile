@@ -9,21 +9,6 @@ import UIKit
 import CoreData
 import Alamofire
 
-struct Todo: Decodable {
-    let id: Int
-    let todo: String
-    let completed: Bool
-    let userId: Int
-}
-
-// Define the response model
-struct TodoResponse: Decodable {
-    let todos: [Todo]
-    let total: Int
-    let skip: Int
-    let limit: Int
-}
-
 public final class CoreDataManager: NSObject {
     
     public static let shared = CoreDataManager()
