@@ -29,13 +29,13 @@ class ToDoListRouter {
     
     func navigateToAddToDo(rootPresenter: ToDoListPresenter) {
         let addToDoVC = AddToDoRouter.assembleModule(rootPresenter: rootPresenter)
-        addToDoVC.modalPresentationStyle = .fullScreen
+        addToDoVC.modalPresentationStyle = .pageSheet
         viewController?.present(addToDoVC, animated: true, completion: nil)
     }
     
     func navigateToEditToDo(for toDo: ToDoItem, rootPresenter: ToDoListPresenter) {
         let editToDoVC = EditToDoRouter.assembleModule(toDoItem: toDo, rootPresenter: rootPresenter)
-        editToDoVC.modalPresentationStyle = .fullScreen
+        editToDoVC.modalPresentationStyle = .pageSheet
         viewController?.present(editToDoVC, animated: true, completion: nil)
     }
 }
